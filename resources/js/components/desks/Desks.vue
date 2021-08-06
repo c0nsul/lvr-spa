@@ -8,6 +8,7 @@
                     <router-link class="card-body" :to="{name: 'showDesk', params: {deskId: desk.id}}">
                         <h4 class="card-title">{{desk.name}}</h4>
                     </router-link>
+                    <button type="button" class="btn btn-danger mt-3" @click="deleteDesk(desk.id)">Remove</button>
                 </div>
             </div>
         </div>
@@ -31,21 +32,44 @@ export default {
         return {
             desks: [],
             error: false,
-            loading: true
+            loading: true,
         }
     },
     mounted() {
-        axios.get('/api/V1/desks')
-        .then(response => {
-            this.desks = response.data.data;
-        })
-        .finally(()=>{
-            this.loading = false;
-        })
-        .catch(error =>{
-            console.log(error);
-            this.error = true;
-        })
-    }
+       this.getAllDesks();
+    },
+    methods: {
+        getAllDesks(){
+            axios.get('/api/V1/desks')
+                .then(response => {
+                    this.desks = response.data.data;
+                })
+                .finally(()=>{
+                    this.loading = false;
+                })
+                .catch(error =>{
+                    console.log(error);
+                    this.error = true;
+                })
+        },
+        deleteDesk(id){
+            if (confirm('Do you really want to delete?')){
+                axios.post('/api/V1/desks/'+id, {
+                    _method: 'DELETE',
+                })
+                    .then(response => {
+                        this.desks = [],
+                        this.getAllDesks();
+                    })
+                    .finally(()=>{
+                        this.loading = false;
+                    })
+                    .catch(error =>{
+                        console.log(error);
+                        this.error = true;
+                    })
+            }
+        }
+    },
 }
 </script>

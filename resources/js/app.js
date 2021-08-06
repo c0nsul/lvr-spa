@@ -2,8 +2,10 @@ require('./bootstrap');
 
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Vuelidate from "vuelidate";
 
 Vue.use(VueRouter);
+Vue.use(Vuelidate);
 
 import Home from "./components/Home";
 import App from "./components/App";
