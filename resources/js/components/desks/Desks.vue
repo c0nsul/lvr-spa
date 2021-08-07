@@ -2,7 +2,7 @@
     <div class="container">
         <h1>Desks</h1>
 
-        <form @submit.prevent="newDesk">
+        <form @submit.prevent="addNewDesk">
             <div class="form-group">
                 <input v-model="name" :class="{ 'is-invalid': $v.name.$error}" class="form-control" placeholder="Enter desk name"
                        type="text">
@@ -63,7 +63,7 @@ export default {
         }
     },
     methods: {
-        newDesk() {
+        addNewDesk() {
             this.$v.$touch()
             if (this.$v.$anyError) {
                 return;
