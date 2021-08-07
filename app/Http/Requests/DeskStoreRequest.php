@@ -23,11 +23,19 @@ class DeskStoreRequest extends FormRequest
      */
     public function rules()
     {
+        //req
+        //max 255
+        //uniq name
+        //uniq deks
+        //check except current desk id
         return [
-            'name' => 'required|max:255|unique:desks,name',
+            'name' => 'required|max:255|unique:desks,name,'.$this->desk->id,
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function messages()
     {
         return [

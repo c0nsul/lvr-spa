@@ -1,6 +1,7 @@
 <template>
     <div class="container">
         <div class="form-group">
+            <h3>{{name}}</h3>
             <input @blur="saveName" class="form-control" :class="{ 'is-invalid': $v.name.$error}" type="text" v-model="name">
             <div class="invalid-feedback" v-if="!$v.name.required">
                 This field is required!
