@@ -53,7 +53,6 @@ class DeskController extends Controller
     public function update(DeskStoreRequest $request, Desk $desk)
     {
         $desk->update($request->validated());
-
         return new DeskResource($desk);
     }
 

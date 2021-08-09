@@ -35,10 +35,23 @@
 
             <div v-for="deskList in deskLists" class="col-lg-4">
                 <div class="card mt-3">
-                    <a class="card-body" href="#">
-                        <h4 class="card-title">{{ deskList.name }}</h4>
-                    </a>
-                    <button class="btn btn-danger mt-3" type="button" @click="deleteDeskList(deskList.id)">Remove</button>
+                    <div class="card-body">
+                        <form @submit.prevent="updateDeskList(deskList.id,deskList.name)" v-if="desk_list_input_id == deskList.id"
+                              class="d-flex justify-content-between align-items-lg-center">
+                            <input v-model="deskList.name" class="form-control" placeholder="Enter desk list name"
+                                   type="text">
+                            <button aria-label="Close" class="close" type="button" @click="desk_list_input_id=null">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </form>
+                        <h4 v-else class="card-title d-flex justify-content-between align-items-lg-center"
+                            @click="desk_list_input_id=deskList.id">{{ deskList.name }} <i class="fas fa-pencil-alt"
+                                                                                           style="font-size: 15px;cursor: pointer"></i>
+                        </h4>
+                    </div>
+
+                    <button class="btn btn-danger mt-3" type="button" @click="deleteDeskList(deskList.id)">Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -64,9 +77,27 @@ export default {
             error: false,
             loading: true,
             deskLists: true,
+            desk_list_input_id: null,
         }
     },
     methods: {
+        updateDeskList(id, name){
+            this.loading = true;
+            axios.post('/api/V1/desk-lists/'+id, {
+                _method: "PUT",
+                name: name,
+            })
+            .then(response => {
+                this.desk_list_input_id = null;
+            })
+            .finally(() => {
+                this.loading = false;
+            })
+            .catch(error => {
+                console.log(error);
+                this.error = true;
+            })
+        },
         getDeskLists() {
             this.loading = true;
             axios.get('/api/V1/desk-lists', {
@@ -86,8 +117,8 @@ export default {
                 })
         },
         saveName() {
-            this.$v.$touch()
-            if (this.$v.$anyError) {
+            this.$v.name.$touch()
+            if (this.$v.name.$anyError) {
                 return;
             }
             axios.post('/api/V1/desks/' + this.deskId, {
@@ -141,7 +172,7 @@ export default {
                 })
                     .then(response => {
                         this.desk_lists = [],
-                        this.getDeskLists();
+                            this.getDeskLists();
                     })
                     .finally(() => {
                         this.loading = false;
