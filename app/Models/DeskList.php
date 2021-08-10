@@ -8,5 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class DeskList extends Model
 {
     use HasFactory;
+
     protected $fillable = ['name', 'desk_id'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cards(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Card::class);
+    }
+
 }

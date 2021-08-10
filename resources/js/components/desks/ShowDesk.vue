@@ -36,8 +36,9 @@
             <div v-for="deskList in deskLists" class="col-lg-4">
                 <div class="card mt-3">
                     <div class="card-body">
-                        <form @submit.prevent="updateDeskList(deskList.id,deskList.name)" v-if="desk_list_input_id == deskList.id"
-                              class="d-flex justify-content-between align-items-lg-center">
+                        <form v-if="desk_list_input_id == deskList.id"
+                              class="d-flex justify-content-between align-items-lg-center"
+                              @submit.prevent="updateDeskList(deskList.id,deskList.name)">
                             <input v-model="deskList.name" class="form-control" placeholder="Enter desk list name"
                                    type="text">
                             <button aria-label="Close" class="close" type="button" @click="desk_list_input_id=null">
@@ -48,14 +49,31 @@
                             @click="desk_list_input_id=deskList.id">{{ deskList.name }} <i class="fas fa-pencil-alt"
                                                                                            style="font-size: 15px;cursor: pointer"></i>
                         </h4>
+                        <button class="btn btn-danger mt-3" type="button" @click="deleteDeskList(deskList.id)">Remove
+                        </button>
+
+                        <div v-for="card in deskList.cards" :key="card.id" class="card mt-3 bg-light">
+                            <div class="card-body">
+                                <h4 class="card-title d-flex justify-content-between align-items-center"
+                                    style="cursor: pointer;">{{ card.name }}</h4>
+                                <button class="btn btn-secondary mt-3" type="button">Remove</button>
+                            </div>
+                        </div>
+                        <form class="mt-3" @submit.prevent="addNewCard(deskList.id)">
+                            <input v-model="card_names[deskList.id]" class="form-control" placeholder="enter card name"
+                                   type="text" :class="{'is-invalid': $v.card_names.$each[deskList.id].$error}">
+                            <div v-if="!$v.card_names.$each[deskList.id].required" class="invalid-feedback">
+                                This field is required!
+                            </div>
+                            <div v-if="!$v.card_names.$each[deskList.id].maxLength" class="invalid-feedback">
+                                MAX Characters: {{ $v.card_names.$each[deskList.id].$params.maxLength.max }}
+                            </div>
+                        </form>
                     </div>
 
-                    <button class="btn btn-danger mt-3" type="button" @click="deleteDeskList(deskList.id)">Remove
-                    </button>
                 </div>
             </div>
         </div>
-
         <button v-if="loading" class="btn btn-primary" disabled type="button">
             <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
         </button>
@@ -76,27 +94,53 @@ export default {
             desk_list_name: null,
             error: false,
             loading: true,
-            deskLists: true,
+            deskLists: [],
             desk_list_input_id: null,
+            card_names: [],
         }
     },
     methods: {
-        updateDeskList(id, name){
+        addNewCard(desk_list_id) {
+            this.$v.card_names.$each[desk_list_id].$touch()
+            if (this.$v.card_names.$each[desk_list_id].$anyError) {
+                return;
+            }
+
             this.loading = true;
-            axios.post('/api/V1/desk-lists/'+id, {
+            axios.post('/api/V1/cards', {
+                name: this.card_names[desk_list_id],
+                desk_list_id
+            })
+                .then(response => {
+                    //clear validation fields
+                    this.$v.$reset();
+                    this.getDeskLists();
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.error = true;
+                })
+
+        },
+        updateDeskList(id, name) {
+            this.loading = true;
+            axios.post('/api/V1/desk-lists/' + id, {
                 _method: "PUT",
                 name: name,
             })
-            .then(response => {
-                this.desk_list_input_id = null;
-            })
-            .finally(() => {
-                this.loading = false;
-            })
-            .catch(error => {
-                console.log(error);
-                this.error = true;
-            })
+                .then(response => {
+                    this.desk_list_input_id = null;
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.error = true;
+                })
         },
         getDeskLists() {
             this.loading = true;
@@ -107,6 +151,9 @@ export default {
             })
                 .then(response => {
                     this.deskLists = response.data.data;
+                    this.deskLists.forEach(el => {
+                        this.card_names[el.id] = ''
+                    })
                 })
                 .finally(() => {
                     this.loading = false;
@@ -140,13 +187,15 @@ export default {
             if (this.$v.$anyError) {
                 return;
             }
+
+            this.loading = true;
             axios.post('/api/V1/desk-lists', {
                 name: this.desk_list_name,
                 desk_id: this.deskId
             })
                 .then(response => {
+                    this.$v.$reset();
                     this.desk_list_name = '';
-                    this.loading = true;
                     this.desk_lists = [];
                     this.getDeskLists();
                 })
@@ -206,6 +255,12 @@ export default {
         desk_list_name: {
             required,
             maxLength: maxLength(255),
+        },
+        card_names: {
+            $each: {
+                required,
+                maxLength: maxLength(255),
+            }
         }
     }
 }
