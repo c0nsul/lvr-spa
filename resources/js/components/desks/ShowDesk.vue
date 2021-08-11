@@ -54,9 +54,14 @@
 
                         <div v-for="card in deskList.cards" :key="card.id" class="card mt-3 bg-light">
                             <div class="card-body">
-                                <h4 class="card-title d-flex justify-content-between align-items-center"
+                                <h4 class="card-title d-flex justify-content-between align-items-center mb-3"
                                     style="cursor: pointer;">{{ card.name }}</h4>
-                                <button class="btn btn-secondary mt-3" type="button">Remove</button>
+
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModallong">
+                                    Open
+                                </button>
+
+                                <button @click="deleteCard(card.id)" class="btn btn-secondary" type="button">Remove card</button>
                             </div>
                         </div>
                         <form class="mt-3" @submit.prevent="addNewCard(deskList.id)">
@@ -69,6 +74,24 @@
                                 MAX Characters: {{ $v.card_names.$each[deskList.id].$params.maxLength.max }}
                             </div>
                         </form>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        body
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -78,7 +101,11 @@
             <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
         </button>
 
+
     </div>
+
+
+
 </template>
 
 <script>
@@ -100,6 +127,24 @@ export default {
         }
     },
     methods: {
+        deleteCard(id){
+            if (confirm('Do you really want to delete card?')) {
+                this.loading = true;
+                axios.post('/api/V1/cards/' + id, {
+                    _method: "DELETE",
+                })
+                    .then(response => {
+                        this.getDeskLists();
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.error = true;
+                    })
+            }
+        },
         addNewCard(desk_list_id) {
             this.$v.card_names.$each[desk_list_id].$touch()
             if (this.$v.card_names.$each[desk_list_id].$anyError) {

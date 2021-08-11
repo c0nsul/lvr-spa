@@ -65,7 +65,6 @@ class DeskController extends Controller
     public function destroy(Desk $desk)
     {
         $desk->delete();
-
         return \response(null, Response::HTTP_NO_CONTENT);
     }
 }
