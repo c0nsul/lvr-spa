@@ -36,24 +36,25 @@ class CardController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param Card $card
+     * @return CardResource
      */
-    public function show($id)
+    public function show(Card $card)
     {
-        //
+        return new CardResource($card);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return Response
+     * @param CardStoreRequest $request
+     * @param Card $card
+     * @return CardResource
      */
-    public function update(Request $request, $id)
+    public function update(CardStoreRequest $request, Card $card): CardResource
     {
-        //
+        $card->update($request->validated());
+        return new CardResource($card);
     }
 
     /**
