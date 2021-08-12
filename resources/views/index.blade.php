@@ -11,12 +11,18 @@
           crossorigin="anonymous">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" integrity="sha512-F5QTlBqZlvuBEs9LQPqc1iZv2UMxcVXezbHzomzS6Df4MZMClge/8+gXrKw2fl5ysdk4rWjR0vKS7NNkfymaBQ==" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{{mix('css/app.css')}}">
+
+    <!----fuckem on--->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!----fuckem off--->
+    <link rel="stylesheet" href="{{asset('css/app.css')}}">
 </head>
 <body>
     <div id="app">
         <app></app>
     </div>
-<script src="{{mix('/js/app.js')}}" defer></script>
+<script src="{{asset('/js/app.js')}}"></script>
 </body>
 </html>

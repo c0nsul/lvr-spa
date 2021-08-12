@@ -4,6 +4,10 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Vuelidate from "vuelidate";
 
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+
 Vue.use(VueRouter);
 Vue.use(Vuelidate);
 

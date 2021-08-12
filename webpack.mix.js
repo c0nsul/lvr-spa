@@ -11,6 +11,13 @@ const mix = require('laravel-mix');
  |
  */
 
+/*
+mix.autoload({
+    jquery: ['$', 'window.jQuery',"jQuery","window.$","jquery","window.jquery"],
+    'popper.js/dist/umd/popper.js': ['Popper']
+})
+ */
+
 mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css').vue()
+    .sass('resources/scss/app.scss', 'public/css').vue()
     .sourceMaps();
