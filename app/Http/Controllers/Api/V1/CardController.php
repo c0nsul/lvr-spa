@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CardStoreRequest;
 use App\Http\Resources\CardResource;
-use Illuminate\Http\Request;
 use App\Models\Card;
 use Illuminate\Http\Response;
 

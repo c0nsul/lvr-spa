@@ -121,11 +121,29 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
                     <div class="modal-body">
+
                         <div class="form-check" v-for="task in current_card.tasks">
                             <input class="form-check-input" type="checkbox" id="inlineChk" value="opt1">
                             <label class="form-check-label" for="inlineChk">{{task.name}}</label>
                         </div>
+
+
+                        <form class="mt-4" @submit.prevent="addNewTask" >
+                            <div class="form-group">
+                                <input v-model="new_task_name" :class="{ 'is-invalid': $v.new_task_name.$error}" class="form-control" placeholder="Enter task name" type="text">
+
+                                <div v-if="!$v.new_task_name.required" class="invalid-feedback">
+                                    This field is required!
+                                </div>
+                                <div v-if="!$v.new_task_name.maxLength" class="invalid-feedback">
+                                    MAX Characters: {{ $v.new_task_name.$params.maxLength.max }}
+                                </div>
+
+                            </div>
+                        </form>
+
                     </div>
                 </div>
             </div>
@@ -155,9 +173,35 @@ export default {
             card_names: [],
             current_card: [],
             show_card_name_input: false,
+            new_task_name: '',
         }
     },
     methods: {
+        addNewTask(){
+            this.$v.new_task_name.$touch()
+            if (this.$v.new_task_name.$anyError) {
+                return;
+            }
+
+            this.loading = true;
+            axios.post('/api/V1/tasks', {
+                name: this.new_task_name,
+                card_id: this.current_card.id,
+            })
+                .then(response => {
+                    this.$v.$reset();
+                    this.new_task_name = '';
+                    this.getCard(this.current_card.id);
+
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.log(error.response);
+                    this.error = true;
+                })
+        },
         updateCardName(){
             this.$v.current_card.name.$touch()
             if (this.$v.current_card.name.$anyError) {
@@ -238,7 +282,6 @@ export default {
                     console.log(error);
                     this.error = true;
                 })
-
         },
         updateDeskList(id, name) {
             this.$v.deskLists.$touch()
@@ -324,12 +367,6 @@ export default {
                 })
                 .catch(getEerror => {
                     console.log(getEerror.response)
-                    /*
-                    if (getEerror.response.data.errors.name) {
-                        this.errors = [];
-                        this.errors.push(getEerror.response.data.errors.name[0])
-                    }
-                    */
                     this.error = true;
                 })
         },
@@ -395,6 +432,10 @@ export default {
                     maxLength: maxLength(255),
                 }
             }
+        },
+        new_task_name: {
+            required,
+            maxLength: maxLength(255),
         }
     }
 }
