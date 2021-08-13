@@ -33,7 +33,7 @@
 
         <div class="row">
 
-            <div v-for="deskList in deskLists" class="col-lg-4">
+            <div v-for="(deskList, index) in deskLists" class="col-lg-4" :key="deskList.id">
                 <div class="card mt-3">
                     <div class="card-body">
 
@@ -41,8 +41,16 @@
                               class="d-flex justify-content-between align-items-lg-center"
                               @submit.prevent="updateDeskList(deskList.id,deskList.name)">
                             <input v-model="deskList.name" class="form-control" placeholder="Enter desk list name"
-                                   type="text">
-                            <button aria-label="Close" class="close" type="button" @click="desk_list_input_id=null">
+                                   type="text" :class="{'is-invalid': $v.deskLists.$each[index].name.$error}">
+
+                            <div v-if="!$v.deskLists.$each[index].name.required" class="invalid-feedback ml-3">
+                                This field is required!
+                            </div>
+                            <div v-if="!$v.deskLists.$each[index].name.maxLength" class="invalid-feedback">
+                                MAX Characters: {{ $v.deskLists.$each[index].name.$params.maxLength.max}}
+                            </div>
+
+                            <button aria-label="Close" class="close" type="button" @click="updateDeskList(deskList.id,deskList.name)">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </form>
@@ -103,7 +111,7 @@
                                 MAX Characters: {{ $v.current_card.name.$params.maxLength.max }}
                             </div>
 
-                            <button aria-label="Close" class="close" type="button" @click="show_card_name_input = false;">
+                            <button aria-label="Close" class="close" type="button" @click="updateCardName">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </form>
@@ -153,6 +161,7 @@ export default {
                 return;
             }
             this.loading = true;
+            this.show_card_name_input = false;
             axios.post('/api/V1/cards/' + this.current_card.id, {
                 _method: "PATCH",
                 name: this.current_card.name,
@@ -229,6 +238,11 @@ export default {
 
         },
         updateDeskList(id, name) {
+            this.$v.deskLists.$touch()
+            if (this.$v.deskLists.$anyError) {
+                return;
+            }
+            this.desk_list_input_id=null;
             this.loading = true;
             axios.post('/api/V1/desk-lists/' + id, {
                 _method: "PUT",
@@ -369,6 +383,14 @@ export default {
             name: {
                 required,
                 maxLength: maxLength(255),
+            }
+        },
+        deskLists: {
+            $each: {
+                name: {
+                    required,
+                    maxLength: maxLength(255),
+                }
             }
         }
     }
