@@ -122,7 +122,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
-
+                        <div class="form-check" v-for="task in current_card.tasks">
+                            <input class="form-check-input" type="checkbox" id="inlineChk" value="opt1">
+                            <label class="form-check-label" for="inlineChk">{{task.name}}</label>
+                        </div>
                     </div>
                 </div>
             </div>
