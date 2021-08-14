@@ -127,6 +127,9 @@
                         <div class="form-check" v-for="task in current_card.tasks">
                             <input class="form-check-input" type="checkbox" id="inlineChk" value="opt1">
                             <label class="form-check-label" for="inlineChk">{{task.name}}</label>
+                            <button type="button" class="close ml-3"  aria-label="Close" @click="deleteTask(task.id)">
+                                <span  aria-hidden="true">&times;</span>
+                            </button>
                         </div>
 
 
@@ -142,6 +145,11 @@
                                 </div>
 
                             </div>
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
                         </form>
 
                     </div>
@@ -177,6 +185,25 @@ export default {
         }
     },
     methods: {
+        deleteTask(id){
+            if (confirm('Do you really want to delete task?')) {
+                this.loading = true;
+                axios.post('/api/V1/tasks/' + id, {
+                    _method: "DELETE",
+                })
+                    .then(response => {
+                        this.$v.$reset();
+                        this.getCard(this.current_card.id);
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.error = true;
+                    })
+            }
+        },
         addNewTask(){
             this.$v.new_task_name.$touch()
             if (this.$v.new_task_name.$anyError) {
