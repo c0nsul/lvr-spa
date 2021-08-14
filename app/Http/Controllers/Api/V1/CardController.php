@@ -15,9 +15,9 @@ class CardController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        //
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     /**

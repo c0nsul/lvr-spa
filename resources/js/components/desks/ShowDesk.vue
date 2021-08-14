@@ -124,9 +124,19 @@
 
                     <div class="modal-body">
 
-                        <div class="form-check" v-for="task in current_card.tasks">
+                        <div class="form-check" v-for="(task,index) in current_card.tasks">
                             <input class="form-check-input" type="checkbox" id="inlineChk" value="opt1">
-                            <label class="form-check-label" for="inlineChk">{{task.name}}</label>
+
+                            <form @submit.prevent="updateTask(current_card.tasks[index])" v-if="task_input_name_id == task.id" style="width: 50%">
+                                <input v-model="current_card.tasks[index].name"  class="form-control" placeholder="Enter task name" type="text" :class="{'is-invalid': $v.name.$error}" style="width: 25%">
+                            </form>
+                             <label v-else  class="form-check-label" for="inlineChk">{{task.name}}</label>
+
+
+                            <span  @click="task_input_name_id = task.id" v-if="task_input_name_id != task.id">
+                                <i class="ml-3 fas fa-pencil-alt" style="font-size: 15px;cursor: pointer"></i>
+                            </span>
+
                             <button type="button" class="close ml-3"  aria-label="Close" @click="deleteTask(task.id)">
                                 <span  aria-hidden="true">&times;</span>
                             </button>
@@ -182,9 +192,29 @@ export default {
             current_card: [],
             show_card_name_input: false,
             new_task_name: '',
+            task_input_name_id: '',
         }
     },
     methods: {
+        updateTask(task){
+            this.loading = true;
+            axios.post('/api/V1/tasks/' + task.id, {
+                _method: "PATCH",
+                name: task.name,
+                is_done: task.is_done,
+                card_id: task.card_id,
+            })
+                .then(response => {
+                    this.task_input_name_id = null;
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.log(error);
+                    this.error = true;
+                })
+        },
         deleteTask(id){
             if (confirm('Do you really want to delete task?')) {
                 this.loading = true;

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskStoreRequest;
+use App\Http\Requests\TaskUpdateRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class TaskController extends Controller
@@ -41,19 +41,20 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        //
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param  int  $id
-     * @return Response
+     * @param TasStoreRequest $request
+     * @param Task $task
+     * @return TaskResource
      */
-    public function update(Request $request, $id)
+    public function update(TaskUpdateRequest $request, Task $task): TaskResource
     {
-        //
+        $task->update($request->validated());
+        return new TaskResource($task);
     }
 
     /**
