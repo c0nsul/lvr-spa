@@ -125,12 +125,12 @@
                     <div class="modal-body">
 
                         <div class="form-check" v-for="(task,index) in current_card.tasks">
-                            <input class="form-check-input" type="checkbox" id="inlineChk" value="opt1">
+                            <input class="form-check-input" type="checkbox" :id="'inlineChk'+index" v-model="current_card.tasks[index].is_done" @change="updateTask(current_card.tasks[index])">
 
                             <form @submit.prevent="updateTask(current_card.tasks[index])" v-if="task_input_name_id == task.id" style="width: 50%">
-                                <input v-model="current_card.tasks[index].name"  class="form-control" placeholder="Enter task name" type="text" :class="{'is-invalid': $v.name.$error}" style="width: 25%">
+                                <input v-model="current_card.tasks[index].name"  class="form-control" placeholder="EDIT task name" type="text" :class="{'is-invalid': $v.name.$error}" style="width: 25%">
                             </form>
-                             <label v-else  class="form-check-label" for="inlineChk">{{task.name}}</label>
+                             <label v-else  class="form-check-label" :for="'inlineChk'+index">{{task.name}}</label>
 
 
                             <span  @click="task_input_name_id = task.id" v-if="task_input_name_id != task.id">
@@ -197,6 +197,14 @@ export default {
     },
     methods: {
         updateTask(task){
+
+            /*
+            this.$v.task.name.$touch()
+            if (this.$v.task.name.$anyError) {
+                return;
+            }
+            */
+
             this.loading = true;
             axios.post('/api/V1/tasks/' + task.id, {
                 _method: "PATCH",
